@@ -220,7 +220,16 @@ namespace RealtimeCSG.Components
 
         internal void OnTransformChildrenChanged()
         {
-            if(CSGSceneManagerRedirector.Interface != null)
+            CSGNode[] childNodes = GetComponentsInChildren<CSGNode>();
+
+            foreach (CSGNode _node in childNodes)
+            {
+                _node.Sort();
+            }
+
+            forceUpdate = true;
+
+            if (CSGSceneManagerRedirector.Interface != null)
             {
                 CSGSceneManagerRedirector.Interface.OnTransformChildrenChanged(this);
             }

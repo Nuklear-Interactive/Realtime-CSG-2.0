@@ -549,9 +549,9 @@ namespace RealtimeCSG
                     //Sorting GUI
                     GUILayout.Space(10);
                     GUILayout.BeginVertical(GUI.skin.box);
-                    EditorGUILayout.LabelField("Sort Mode");
+                    EditorGUILayout.LabelField("Sort");
 
-                    NodeSortMode guiSortMode = targetNodes[0].sortMode;
+                    NodeSortMode guiSortMode = targetNodes.Length > 0 ? targetNodes[0].sortMode : NodeSortMode.Default;
 
                     EditorGUI.BeginChangeCheck();
 
@@ -568,6 +568,11 @@ namespace RealtimeCSG
                         for (int i = 0; i < targetNodes.Length; i++)
                         {
                             targetNodes[i].sortMode = guiSortMode;
+                        }
+
+                        for (int i = 0; i < targetNodes.Length; i++)
+                        {
+                            targetNodes[i].Sort();
                         }
                     }
 

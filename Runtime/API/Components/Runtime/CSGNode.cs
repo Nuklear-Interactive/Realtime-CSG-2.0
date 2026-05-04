@@ -45,6 +45,53 @@ namespace RealtimeCSG.Components
         [SerializeField] public NodeSortMode sortMode = NodeSortMode.Default;
 
         public const int INVALID_NODE_ID = 0;
+
+        public void Sort()
+        {
+            if (sortMode == NodeSortMode.Top)
+            {
+                if (transform.GetSiblingIndex() > 0)
+                {
+                    Transform objectAbove = transform.parent.GetChild(transform.GetSiblingIndex() - 1);
+
+                    CSGNode aboveNode = objectAbove.GetComponent<CSGNode>();
+
+                    if (aboveNode == null)
+                    {
+                        transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+                    }
+                    else
+                    {
+                        if (aboveNode.sortMode != NodeSortMode.Top)
+                        {
+                            transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+                        }
+                    }
+                }
+            }
+            else if (sortMode == NodeSortMode.Bottom)
+            {
+                if (transform.GetSiblingIndex() < transform.parent.childCount - 1)
+                {
+                    Transform objectBelow = transform.parent.GetChild(transform.GetSiblingIndex() + 1);
+
+                    CSGNode belowNode = objectBelow.GetComponent<CSGNode>();
+
+                    if (belowNode == null)
+                    {
+                        transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+                    }
+                    else
+                    {
+                        if (belowNode.sortMode != NodeSortMode.Bottom)
+                        {
+                            transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+                        }
+                    }
+                }
+            }
+
+        }
 #endif
     }
 }
