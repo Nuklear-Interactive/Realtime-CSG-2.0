@@ -23,6 +23,13 @@ namespace RealtimeCSG.Components
       , AlignSurfaceUp
       , Default
     }
+
+    public enum NodeSortMode
+    {
+        Default,
+        Top,
+        Bottom
+    }
 #endif
 
     /// <summary>Parent class of <see cref="CSGBrush"/>/<see cref="CSGOperation"/>/<see cref="CSGModel"/></summary>
@@ -35,6 +42,7 @@ namespace RealtimeCSG.Components
         [SerializeField] public PrefabInstantiateBehaviour prefabBehaviour = PrefabInstantiateBehaviour.Reference;
         [SerializeField] public PrefabSourceAlignment prefabSourceAlignment = PrefabSourceAlignment.AlignedTop;
         [SerializeField] public PrefabDestinationAlignment prefabDestinationAlignment = PrefabDestinationAlignment.AlignToSurface;
+        [SerializeField] public NodeSortMode sortMode = NodeSortMode.Default;
 
         public const int INVALID_NODE_ID = 0;
 #endif

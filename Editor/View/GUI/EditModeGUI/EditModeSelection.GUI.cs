@@ -546,7 +546,35 @@ namespace RealtimeCSG
 
                     GUILayout.EndVertical();
 
-                    if(targetOperations.Length == 0 && targetModels.Length == 0)
+                    //Sorting GUI
+                    GUILayout.Space(10);
+                    GUILayout.BeginVertical(GUI.skin.box);
+                    EditorGUILayout.LabelField("Sort Mode");
+
+                    NodeSortMode guiSortMode = targetNodes[0].sortMode;
+
+                    EditorGUI.BeginChangeCheck();
+
+                    guiSortMode = (NodeSortMode)EditorGUILayout.EnumPopup(guiSortMode);
+
+                    if(targetNodes.Length > 1)
+                    {
+                        EditorGUILayout.LabelField("Multiple CSG Nodes Selected", EditorStyles.miniLabel);
+                    }
+
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        Undo.RecordObjects(targetNodes, "Changed Sort Mode of Nodes");
+                        for (int i = 0; i < targetNodes.Length; i++)
+                        {
+                            targetNodes[i].sortMode = guiSortMode;
+                        }
+                    }
+
+                    GUILayout.EndVertical();
+
+                    //Surfaces GUI
+                    if (targetOperations.Length == 0 && targetModels.Length == 0)
                     {
                         GUILayout.Space(10);
 
@@ -611,7 +639,7 @@ namespace RealtimeCSG
                         }
                     }
 
-                    if(handleAsOne.HasValue)
+                    if (handleAsOne.HasValue)
                     {
                         EditorGUI.BeginChangeCheck();
 
