@@ -240,7 +240,18 @@ namespace RealtimeCSG.Components
 
         internal void Update()
         {
-            if(CSGSceneManagerRedirector.Interface != null && !IsRegistered)
+            if (childNodes.Length > 0)
+            {
+#if UNITY_EDITOR
+                UnityEditor.Undo.RecordObjects(childNodes, "Changed Sort Mode of Nodes");
+#endif
+                foreach (CSGNode _node in childNodes)
+                {
+                    _node.Sort();
+                }
+            }
+
+            if (CSGSceneManagerRedirector.Interface != null && !IsRegistered)
             {
                 CSGSceneManagerRedirector.Interface.OnUpdate(this);
             }
