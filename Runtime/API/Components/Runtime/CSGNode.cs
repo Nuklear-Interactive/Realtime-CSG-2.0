@@ -49,49 +49,89 @@ namespace RealtimeCSG.Components
 
         public void Sort()
         {
+            if(this is CSGModel)
+            {
+                return;
+            }
+
             int intialSiblingIndex = transform.GetSiblingIndex();
 
-            if (sortMode == NodeSortMode.Top)
+            switch(sortMode)
             {
-                if (transform.GetSiblingIndex() > 0)
-                {
-                    Transform objectAbove = transform.parent.GetChild(transform.GetSiblingIndex() - 1);
+                case NodeSortMode.Default:
 
-                    CSGNode aboveNode = objectAbove.GetComponent<CSGNode>();
-
-                    if (aboveNode == null)
+                    if (transform.GetSiblingIndex() > 0)
                     {
-                        transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+                        Transform objectAbove = transform.parent.GetChild(transform.GetSiblingIndex() - 1);
+
+                        CSGNode aboveNode = objectAbove.GetComponent<CSGNode>();
+
+                        if (aboveNode != null)
+                        {
+                            if (aboveNode.sortMode == NodeSortMode.Bottom)
+                            {
+                                transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+                            }
+                        }
                     }
-                    else
+
+                    if (transform.GetSiblingIndex() < transform.parent.childCount - 1 && intialSiblingIndex == transform.GetSiblingIndex())
                     {
-                        if (aboveNode.sortMode != NodeSortMode.Top)
+                        Transform objectBelow = transform.parent.GetChild(transform.GetSiblingIndex() + 1);
+
+                        CSGNode belowNode = objectBelow.GetComponent<CSGNode>();
+
+                        if (belowNode != null)
+                        {
+                            if (belowNode.sortMode == NodeSortMode.Top)
+                            {
+                                transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+                            }
+                        }
+                    }
+                        break;
+
+                case NodeSortMode.Top:
+                    if (transform.GetSiblingIndex() > 0)
+                    {
+                        Transform objectAbove = transform.parent.GetChild(transform.GetSiblingIndex() - 1);
+
+                        CSGNode aboveNode = objectAbove.GetComponent<CSGNode>();
+
+                        if (aboveNode == null)
                         {
                             transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
                         }
+                        else
+                        {
+                            if (aboveNode.sortMode != NodeSortMode.Top)
+                            {
+                                transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+                            }
+                        }
                     }
-                }
-            }
-            else if (sortMode == NodeSortMode.Bottom)
-            {
-                if (transform.GetSiblingIndex() < transform.parent.childCount - 1)
-                {
-                    Transform objectBelow = transform.parent.GetChild(transform.GetSiblingIndex() + 1);
+                    break;
 
-                    CSGNode belowNode = objectBelow.GetComponent<CSGNode>();
+                case NodeSortMode.Bottom:
+                    if (transform.GetSiblingIndex() < transform.parent.childCount - 1)
+                    {
+                        Transform objectBelow = transform.parent.GetChild(transform.GetSiblingIndex() + 1);
 
-                    if (belowNode == null)
-                    {
-                        transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
-                    }
-                    else
-                    {
-                        if (belowNode.sortMode != NodeSortMode.Bottom)
+                        CSGNode belowNode = objectBelow.GetComponent<CSGNode>();
+
+                        if (belowNode == null)
                         {
                             transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
                         }
+                        else
+                        {
+                            if (belowNode.sortMode != NodeSortMode.Bottom)
+                            {
+                                transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+                            }
+                        }
                     }
-                }
+                    break;
             }
 
             if(intialSiblingIndex != transform.GetSiblingIndex())
