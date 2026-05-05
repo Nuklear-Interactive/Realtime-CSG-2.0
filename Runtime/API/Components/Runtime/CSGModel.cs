@@ -220,7 +220,9 @@ namespace RealtimeCSG.Components
 
         internal void OnTransformChildrenChanged()
         {
-            childNodes = GetComponentsInChildren<CSGNode>();
+            childNodes = GetChildNodes();
+
+            forceUpdate = true;
 
             if (CSGSceneManagerRedirector.Interface != null)
             {

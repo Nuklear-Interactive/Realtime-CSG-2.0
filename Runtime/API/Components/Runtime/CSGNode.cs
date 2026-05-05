@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using InternalRealtimeCSG;
 using UnityEngine.Serialization;
@@ -138,6 +139,30 @@ namespace RealtimeCSG.Components
             {
                 Sort();
             }
+            else
+            {
+                foreach(CSGNode _child in childNodes)
+                {
+                    _child.Sort();
+                }
+            }
+        }
+
+        protected CSGNode[] GetChildNodes()
+        {
+            List<CSGNode> childNodes = new List<CSGNode>();
+
+            foreach(Transform _child in transform)
+            {
+                CSGNode childNode = _child.GetComponent<CSGNode>();
+
+                if (childNode != null)
+                {
+                    childNodes.Add(childNode);
+                }
+            }
+
+            return childNodes.ToArray();
         }
 #endif
     }
