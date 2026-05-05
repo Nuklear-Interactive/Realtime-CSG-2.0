@@ -47,6 +47,21 @@ namespace RealtimeCSG
 
                 GUI.Label(selectionRect, skin.hierarchyOperations[(int)operationType], CsgguiStyleUtility.RightAlignedLabel);
 
+                if (brush.sortMode != NodeSortMode.Default)
+                {
+                    Rect sortRect = selectionRect;
+                    sortRect.x -= skin.hierarchyOperations[(int)operationType].image.width;
+
+                    GUIContent sortIcon = EditorGUIUtility.IconContent("d_ProfilerTimelineRollUpArrow");
+
+                    if (brush.sortMode == NodeSortMode.Bottom)
+                    {
+                        sortIcon = EditorGUIUtility.IconContent("d_ProfilerTimelineDigDownArrow");
+                    }
+
+                    GUI.Label(sortRect, sortIcon, CsgguiStyleUtility.RightAlignedLabel);
+                }
+
                 return;
             }
 
@@ -55,6 +70,7 @@ namespace RealtimeCSG
             if(operation != null)
             {
                 CSGSkin skin = CsgguiStyleUtility.Skin;
+                float iconWidth = 0;
 
                 if(!operation.PassThrough)
                 {
@@ -64,11 +80,30 @@ namespace RealtimeCSG
                     if(operationTypeIndex >= 0 && operationTypeIndex < skin.hierarchyOperations.Length)
                     {
                         GUI.Label(selectionRect, skin.hierarchyOperations[operationTypeIndex], CsgguiStyleUtility.RightAlignedLabel);
+
+                        iconWidth = skin.hierarchyOperations[operationTypeIndex].image.width;
                     }
                 }
                 else
                 {
                     GUI.Label(selectionRect, skin.hierarchyPassThrough, CsgguiStyleUtility.RightAlignedLabel);
+
+                    iconWidth = skin.hierarchyPassThrough.image.width;
+                }
+
+                if (operation.sortMode != NodeSortMode.Default)
+                {
+                    Rect sortRect = selectionRect;
+                    sortRect.x -= iconWidth;
+
+                    GUIContent sortIcon = EditorGUIUtility.IconContent("d_ProfilerTimelineRollUpArrow");
+
+                    if (operation.sortMode == NodeSortMode.Bottom)
+                    {
+                        sortIcon = EditorGUIUtility.IconContent("d_ProfilerTimelineDigDownArrow");
+                    }
+
+                    GUI.Label(sortRect, sortIcon, CsgguiStyleUtility.RightAlignedLabel);
                 }
             }
         }
