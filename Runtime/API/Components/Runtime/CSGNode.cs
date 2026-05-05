@@ -43,11 +43,14 @@ namespace RealtimeCSG.Components
         [SerializeField] public PrefabSourceAlignment prefabSourceAlignment = PrefabSourceAlignment.AlignedTop;
         [SerializeField] public PrefabDestinationAlignment prefabDestinationAlignment = PrefabDestinationAlignment.AlignToSurface;
         [SerializeField] public NodeSortMode sortMode = NodeSortMode.Default;
+        [SerializeField] public CSGNode[] childNodes = new CSGNode[0];
 
         public const int INVALID_NODE_ID = 0;
 
         public void Sort()
         {
+            int intialSiblingIndex = transform.GetSiblingIndex();
+
             if (sortMode == NodeSortMode.Top)
             {
                 if (transform.GetSiblingIndex() > 0)
@@ -91,6 +94,10 @@ namespace RealtimeCSG.Components
                 }
             }
 
+            if(intialSiblingIndex != transform.GetSiblingIndex())
+            {
+                Sort();
+            }
         }
 #endif
     }

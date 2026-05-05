@@ -134,6 +134,11 @@ namespace RealtimeCSG.Components
             }
         }
 
+        internal void OnTransformChildrenChanged()
+        {
+            childNodes = GetComponentsInChildren<CSGNode>();
+        }
+
         // called when any value of this brush has been modified from within the inspector / or recompile
         internal void OnValidate()
         {
