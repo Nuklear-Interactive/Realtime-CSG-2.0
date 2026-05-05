@@ -71,7 +71,7 @@ namespace RealtimeCSG.Components
                         {
                             if (aboveNode.sortMode == NodeSortMode.Bottom)
                             {
-                                transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+                                UnityEditor.Undo.SetSiblingIndex(transform, transform.GetSiblingIndex() - 1, "Changed Sibling Index");
                             }
                         }
                     }
@@ -86,7 +86,7 @@ namespace RealtimeCSG.Components
                         {
                             if (belowNode.sortMode == NodeSortMode.Top)
                             {
-                                transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+                                UnityEditor.Undo.SetSiblingIndex(transform, transform.GetSiblingIndex() + 1, "Changed Sibling Index");
                             }
                         }
                     }
@@ -101,13 +101,13 @@ namespace RealtimeCSG.Components
 
                         if (aboveNode == null)
                         {
-                            transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+                            UnityEditor.Undo.SetSiblingIndex(transform, transform.GetSiblingIndex() - 1, "Changed Sibling Index");
                         }
                         else
                         {
                             if (aboveNode.sortMode != NodeSortMode.Top)
                             {
-                                transform.SetSiblingIndex(transform.GetSiblingIndex() - 1);
+                                UnityEditor.Undo.SetSiblingIndex(transform, transform.GetSiblingIndex() - 1, "Changed Sibling Index");
                             }
                         }
                     }
@@ -122,13 +122,13 @@ namespace RealtimeCSG.Components
 
                         if (belowNode == null)
                         {
-                            transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+                            UnityEditor.Undo.SetSiblingIndex(transform, transform.GetSiblingIndex() + 1, "Changed Sibling Index");
                         }
                         else
                         {
                             if (belowNode.sortMode != NodeSortMode.Bottom)
                             {
-                                transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+                                UnityEditor.Undo.SetSiblingIndex(transform, transform.GetSiblingIndex() + 1, "Changed Sibling Index");
                             }
                         }
                     }

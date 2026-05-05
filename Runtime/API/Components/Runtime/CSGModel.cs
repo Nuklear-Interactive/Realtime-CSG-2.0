@@ -244,9 +244,6 @@ namespace RealtimeCSG.Components
         {
             if (childNodes.Length > 0)
             {
-#if UNITY_EDITOR
-                UnityEditor.Undo.RecordObjects(childNodes, "Changed Sort Mode of Nodes");
-#endif
                 foreach (CSGNode _node in childNodes)
                 {
                     _node.Sort();

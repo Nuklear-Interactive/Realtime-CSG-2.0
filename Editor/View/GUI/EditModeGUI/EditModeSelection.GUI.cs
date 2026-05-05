@@ -569,6 +569,7 @@ namespace RealtimeCSG
                         {
                             targetNodes[i].sortMode = guiSortMode;
                         }
+                        Undo.FlushUndoRecordObjects();
 
                         for (int i = 0; i < targetNodes.Length; i++)
                         {
