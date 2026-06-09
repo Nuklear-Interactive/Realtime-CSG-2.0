@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using InternalRealtimeCSG;
+using RealtimeCSG.Foundation;
 using UnityEngine.Rendering;
 
 namespace RealtimeCSG
@@ -32,10 +34,10 @@ namespace RealtimeCSG
         internal const string CAST_SHADOWS_MATERIAL_NAME = SPECIAL_SURFACE_SHADER_NAME + "_" + CAST_SHADOWS_NAME;
         internal const string RECEIVE_SHADOWS_MATERIAL_NAME = SPECIAL_SURFACE_SHADER_NAME + "_" + RECEIVE_SHADOWS_NAME;
 
-        private const string WALL_MATERIAL_NAME = "Wall";
-        private const string FLOOR_MATERIAL_NAME = "Floor";
-        private const string WINDOW_MATERIAL_NAME = "Window";
-        private const string METAL_MATERIAL_NAME = "Metal";
+        private const string WALL_MATERIAL_NAME = "M_Wall";
+        private const string FLOOR_MATERIAL_NAME = "M_Floor";
+        private const string WINDOW_MATERIAL_NAME = "M_Window";
+        private const string METAL_MATERIAL_NAME = "M_Metal";
 
         internal static Shader SpecialSurfaceShader;
         internal static Shader TransparentSpecialSurfaceShader;
@@ -54,21 +56,16 @@ namespace RealtimeCSG
         private static readonly int shaderMainTexBaseColorMapProp = Shader.PropertyToID("_BaseColorMap");
         private static readonly int shaderMainTexMainTexProp = Shader.PropertyToID("_MainTex");
 
-        private static readonly int metallicMaterialProp = Shader.PropertyToID("_Metallic");
-        private static readonly int smoothnessMaterialProp = Shader.PropertyToID("_Smoothness");
-        private static readonly int metallicGlossMapMaterialProp = Shader.PropertyToID("_MetallicGlossMap");
-        private static readonly int detailAlbedoMapMaterialProp = Shader.PropertyToID("_DetailAlbedoMap");
-
         private static void ShaderInit()
         {
             m_ShadersInitialized = true;
 
-            m_PixelsPerPointId          = Shader.PropertyToID("_pixelsPerPoint");
+            m_PixelsPerPointId = Shader.PropertyToID("_pixelsPerPoint");
             m_LineThicknessMultiplierId = Shader.PropertyToID("_thicknessMultiplier");
-            m_LineDashMultiplierId      = Shader.PropertyToID("_dashMultiplier");
-            m_LineAlphaMultiplierId     = Shader.PropertyToID("_alphaMultiplier");
+            m_LineDashMultiplierId = Shader.PropertyToID("_dashMultiplier");
+            m_LineAlphaMultiplierId = Shader.PropertyToID("_alphaMultiplier");
 
-            SpecialSurfaceShader            = Shader.Find(SPECIAL_SURFACE_SHADER_ID);
+            SpecialSurfaceShader = Shader.Find(SPECIAL_SURFACE_SHADER_ID);
             TransparentSpecialSurfaceShader = Shader.Find(TRANSPARENT_SPECIAL_SURFACE_SHADER_ID);
         }
 
@@ -105,7 +102,7 @@ namespace RealtimeCSG
 
             material = new Material(shader)
             {
-                name      = materialName
+                name = materialName
               , hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset
             };
 
@@ -150,7 +147,7 @@ namespace RealtimeCSG
 
             material = new Material(shader)
             {
-                name      = name.Replace(':', '_')
+                name = name.Replace(':', '_')
               , hideFlags = HideFlags.None | HideFlags.DontUnloadUnusedAsset
             };
 
@@ -200,76 +197,69 @@ namespace RealtimeCSG
          * 1: Check that we actually have the material were looking for
          * 2: Find RP type, and then create any neccessary directories
          * 3: If we arent on the built-in RP, then update the material to the default material shader for the current RP
-         *   3.1: Stop entirely if the default material shader doesnt have a compatible default main texture property
+         * 3.1: Stop entirely if the default material shader doesnt have a compatible default main texture property
          * 4: Save the changes to disk
          */
         private static void GenerateBuiltinPipelineMaterial(string name)
         {
-            Material material = Resources.Load<Material>($"RealtimeCSG/Materials/{name}");
+            string path = $"RealtimeCSG/Materials/{name}";
+            Material material = Resources.Load<Material>(path);
+            string folderPath = Path.GetFullPath($"{Application.dataPath}/Resources/RealtimeCSG/Materials/");
 
-            if(material == null)
+            if(!Directory.Exists(folderPath))
             {
-                Debug.LogWarningFormat("Could not find material '{0}{1}.mat'. Not generating material '{0}{1}.mat' for the current render pipeline.", "RealtimeCSG/Materials/", name);
-
-                return;
+                Directory.CreateDirectory(folderPath);
             }
 
-            if(GraphicsSettings.defaultRenderPipeline != null) // if we are using any RP
+            // if we cant find the material in resources, then we'll create them under Assets/Resources/RealtimeCSG/Materials/
+            if(material == null)
             {
-                AssetDatabase.StartAssetEditing();
-
-                string pipelineShader = GraphicsSettings.defaultRenderPipeline.defaultMaterial.shader.name;
-
-                material.shader = Shader.Find(pipelineShader);
-
-                // if our shader is already the default RP shader, then don't do anything
-                if(material.shader.name == pipelineShader)
+                using(new AssetHelper.AssetEditingContext())
                 {
-                    AssetDatabase.StopAssetEditing();
+                    RenderPipelineHelper.GetCurrentPipeline(out Shader defaultShader);
+                    material = new Material(defaultShader);
+                    material.name = name;
 
-                    return;
-                }
-
-                if(TryGetShaderMainTex(material, out string mainTexTag))
-                {
-                    material.SetTexture(mainTexTag, Resources.Load<Texture2D>($"RealtimeCSG/Textures/{name}"));
-
-                    if(material.name.Equals("Metal"))
+                    if(material.mainTexture == null)
                     {
-                        // if the material is the built-in metal texture, then we'll set its metalness to 100%
-
-                        if(material.HasProperty(metallicMaterialProp))
+                        switch(name)
                         {
-                            material.SetFloat(metallicMaterialProp, 1f);
-                            material.SetFloat(smoothnessMaterialProp, 1f);
+                            case WALL_MATERIAL_NAME:
+                                material.parent = RcsgEditorResources.DefaultOpaqueMaterial;
+                                material.mainTexture = RcsgEditorResources.Instance.defaultWallTexture;
+                                material.SetFloat("_Smoothness", 0.1f);
 
-                            material.SetTexture(metallicGlossMapMaterialProp, Resources.Load<Texture2D>("RealtimeCSG/Textures/checker_m"));
-                        }
+                                break;
+                            case FLOOR_MATERIAL_NAME:
+                                material.parent = RcsgEditorResources.DefaultOpaqueMaterial;
+                                material.mainTexture = RcsgEditorResources.Instance.defaultFloorTexture;
+                                material.SetFloat("_Smoothness", 0.1f);
 
-                        if(material.HasProperty(detailAlbedoMapMaterialProp))
-                        {
-                            material.SetTexture(detailAlbedoMapMaterialProp, Resources.Load<Texture2D>("RealtimeCSG/Textures/checker"));
+                                break;
+                            case WINDOW_MATERIAL_NAME:
+                                material.parent = RcsgEditorResources.DefaultTransparentMaterial;
+                                material.mainTexture = RcsgEditorResources.Instance.defaultWindowTexture;
+                                material.SetFloat("_Smoothness", 0.9f);
+
+
+                                break;
+                            case METAL_MATERIAL_NAME:
+                                material.parent = RcsgEditorResources.DefaultOpaqueMaterial;
+                                material.mainTexture = RcsgEditorResources.Instance.defaultCheckerTexture;
+                                material.SetTexture(RcsgEditorResources.MetallicMapName, RcsgEditorResources.Instance.defaultMetalnessTexture);
+                                material.SetTexture(RcsgEditorResources.DetailAlbedoMapName, RcsgEditorResources.Instance.defaultDetailCheckerTexture);
+                                material.SetFloat("_Metallic", 1);
+                                material.SetFloat("_Smoothness", 1);
+
+                                break;
                         }
                     }
                 }
-                else // we failed to find any default RP shader, so we'll just abort early
-                {
-                    AssetDatabase.StopAssetEditing();
 
-                    Debug.LogErrorFormat("Could not find a compatible default render pipeline shader. Shader '{0}' does not contain any properties named '_MainTex', '_Albedo', '_Diffuse', or '_BaseColorMap'.", material.shader.name);
-
-                    return;
-                }
-
-                AssetDatabase.StopAssetEditing();
-                EditorUtility.SetDirty(material);
-                AssetDatabase.SaveAssetIfDirty(material);
-
+                AssetDatabase.CreateAsset(material, $"Assets/Resources/{path}.mat");
+                AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-                Resources.UnloadUnusedAssets();
             }
-
-            // using built-in, just dont do anything.
         }
 
         internal static Material GetRuntimeMaterial(string materialName)
@@ -713,8 +703,7 @@ namespace RealtimeCSG
             return newTexture;
         }
 
-        private static readonly Dictionary<Material, RenderSurfaceType> materialTypeLookup =
-            new Dictionary<Material, RenderSurfaceType>();
+        private static readonly Dictionary<Material, RenderSurfaceType> materialTypeLookup = new Dictionary<Material, RenderSurfaceType>();
 
         internal static void ResetMaterialTypeLookup()
         {
@@ -767,49 +756,49 @@ namespace RealtimeCSG
             {
                 case HIDDEN_MATERIAL_NAME:
                 {
-                    surfaceType                  = RenderSurfaceType.Hidden;
+                    surfaceType = RenderSurfaceType.Hidden;
                     materialTypeLookup[material] = surfaceType;
 
                     return surfaceType;
                 }
                 case CULLED_MATERIAL_NAME:
                 {
-                    surfaceType                  = RenderSurfaceType.Culled;
+                    surfaceType = RenderSurfaceType.Culled;
                     materialTypeLookup[material] = surfaceType;
 
                     return surfaceType;
                 }
                 case COLLIDER_MATERIAL_NAME:
                 {
-                    surfaceType                  = RenderSurfaceType.Collider;
+                    surfaceType = RenderSurfaceType.Collider;
                     materialTypeLookup[material] = surfaceType;
 
                     return surfaceType;
                 }
                 case TRIGGER_MATERIAL_NAME:
                 {
-                    surfaceType                  = RenderSurfaceType.Trigger;
+                    surfaceType = RenderSurfaceType.Trigger;
                     materialTypeLookup[material] = surfaceType;
 
                     return surfaceType;
                 }
                 case SHADOW_ONLY_MATERIAL_NAME:
                 {
-                    surfaceType                  = RenderSurfaceType.ShadowOnly;
+                    surfaceType = RenderSurfaceType.ShadowOnly;
                     materialTypeLookup[material] = surfaceType;
 
                     return surfaceType;
                 }
                 case CAST_SHADOWS_MATERIAL_NAME:
                 {
-                    surfaceType                  = RenderSurfaceType.CastShadows;
+                    surfaceType = RenderSurfaceType.CastShadows;
                     materialTypeLookup[material] = surfaceType;
 
                     return surfaceType;
                 }
                 case RECEIVE_SHADOWS_MATERIAL_NAME:
                 {
-                    surfaceType                  = RenderSurfaceType.ReceiveShadows;
+                    surfaceType = RenderSurfaceType.ReceiveShadows;
                     materialTypeLookup[material] = surfaceType;
 
                     return surfaceType;
@@ -825,15 +814,23 @@ namespace RealtimeCSG
         {
             switch(renderSurfaceType)
             {
-                case RenderSurfaceType.Hidden:         return HiddenMaterial;
-                case RenderSurfaceType.Culled:         return CulledMaterial;
-                case RenderSurfaceType.Collider:       return ColliderMaterial;
-                case RenderSurfaceType.Trigger:        return TriggerMaterial;
-                case RenderSurfaceType.ShadowOnly:     return ShadowOnlyMaterial;
-                case RenderSurfaceType.CastShadows:    return CastShadowsMaterial;
-                case RenderSurfaceType.ReceiveShadows: return ReceiveShadowsMaterial;
+                case RenderSurfaceType.Hidden:
+                    return HiddenMaterial;
+                case RenderSurfaceType.Culled:
+                    return CulledMaterial;
+                case RenderSurfaceType.Collider:
+                    return ColliderMaterial;
+                case RenderSurfaceType.Trigger:
+                    return TriggerMaterial;
+                case RenderSurfaceType.ShadowOnly:
+                    return ShadowOnlyMaterial;
+                case RenderSurfaceType.CastShadows:
+                    return CastShadowsMaterial;
+                case RenderSurfaceType.ReceiveShadows:
+                    return ReceiveShadowsMaterial;
                 case RenderSurfaceType.Normal:
-                default: return null;
+                default:
+                    return null;
             }
         }
     }

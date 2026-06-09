@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf8d3644e3314c01bcdf38616a60c713, type: 3}
+  m_Name: RCSG-Editor-Resources
+  m_EditorClassIdentifier: RealtimeCSG.Editor::RealtimeCSG.Foundation.RcsgEditorResources
+  defaultWallTexture: {fileID: 2800000, guid: bbde78473e3c32c4a8444168e94b275f, type: 3}
+  defaultFloorTexture: {fileID: 2800000, guid: 6bdca92006e3ac2418f48650a2e8fcea, type: 3}
+  defaultWindowTexture: {fileID: 2800000, guid: cbec57328563bc34580a5fdffdfd19ac, type: 3}
+  defaultCheckerTexture: {fileID: 2800000, guid: daa9688628be8544bba89e7d90e24c91, type: 3}
+  defaultDetailCheckerTexture: {fileID: 2800000, guid: 816df94e791457149978dc08dd9adf28, type: 3}
+  defaultMetalnessTexture: {fileID: 2800000, guid: b4fe6ae30f2206a4881f7e3c4140999e, type: 3}
+  defaultRoughnessTexture: {fileID: 2800000, guid: 8631cf7d6ef122942ad3bc7c8b8a2257, type: 3}
+  templateUrpOpaqueMaterial: {fileID: 2100000, guid: 7de5ef9aa2e67234f9d81ce87bc13ec6, type: 2}
+  templateUrpTransparentMaterial: {fileID: 2100000, guid: abeab948af2b3fd498eb9644f842eac1, type: 2}
+  templateBirpOpaqueMaterial: {fileID: 2100000, guid: c6103619bf1263a4b9659ee0f598c0ec, type: 2}
+  templateBirpTransparentMaterial: {fileID: 2100000, guid: ed08399fb374f854c9149b43dfba9eba, type: 2}
+  castShadowsTexture: {fileID: 2800000, guid: 4604c5ed1a18c2f42828e95851873d61, type: 3}
+  colliderTexture: {fileID: 2800000, guid: aff84ab785eea6c48ba43e98a589c614, type: 3}
+  culledTexture: {fileID: 2800000, guid: f712b5c6642c6a146b8068482e175ac8, type: 3}
+  discardedTexture: {fileID: 2800000, guid: 5e06adecec378d549858bdbcf1c0b672, type: 3}
+  hiddenTexture: {fileID: 2800000, guid: 54962df4a308fec479d92fa69e062026, type: 3}
+  invisibleTexture: {fileID: 2800000, guid: 95b2eae109f1ae04f94f774b6774edcf, type: 3}
+  receiveShadowsTexture: {fileID: 2800000, guid: e683b148a4301f24f8fdddf8d7b24baf, type: 3}
+  shadowOnlyTexture: {fileID: 2800000, guid: 0339c425395e306469671ade8e5b9296, type: 3}
+  triggerTexture: {fileID: 2800000, guid: 7eac11653d9c4a84e939f236d6ead2db, type: 3}
