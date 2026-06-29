@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 
 namespace RealtimeCSG
 {
-    internal sealed class EditModeManager : ScriptableObject
+    public sealed class EditModeManager : ScriptableObject
     {
         private static EditModeManager m_Instance;
 

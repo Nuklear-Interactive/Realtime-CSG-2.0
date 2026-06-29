@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 namespace RealtimeCSG
 {
     [Serializable]
-    internal sealed class FilteredSelection
+    public sealed class FilteredSelection
     {
         [SerializeField] public Transform[] otherTargets = Array.Empty<Transform>();
         [SerializeField] public CSGNode[] nodeTargets = Array.Empty<CSGNode>();

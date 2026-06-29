@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RealtimeCSG
 {
-    internal interface IEditMode
+    public interface IEditMode
     {
         bool UsesUnitySelection { get; }
         bool IgnoreUnityRect { get; }
