@@ -8,7 +8,7 @@ using UnityEngine.Rendering;
 
 namespace RealtimeCSG
 {
-    public class RenderPipelineHelper
+    public static class RenderPipelineHelper
     {
         public const string URP_TAG = "URP";
         public const string HDRP_TAG = "HDRP";

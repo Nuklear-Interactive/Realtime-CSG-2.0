@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/coloredPolygon"
+Shader "Hidden/CSG/Internal/ColoredPolygon"
 {
     Properties
     {

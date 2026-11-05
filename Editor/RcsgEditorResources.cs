@@ -4,9 +4,7 @@
 // * * * * * * * * * * * * * * * * * * * * * *
 
 using JetBrains.Annotations;
-using UnityEditor.Embree;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace RealtimeCSG.Foundation
 {
@@ -30,6 +28,11 @@ namespace RealtimeCSG.Foundation
         [UsedImplicitly] public Material templateHdrpOpaqueMaterial;
         [UsedImplicitly] public Material templateHdrpTransparentMaterial;
 
+        public Material defaultWallMaterial;
+        public Material defaultFloorMaterial;
+        public Material defaultWindowMaterial;
+        public Material defaultMetalMaterial;
+
         [Header("Editor Resources")]
         [UsedImplicitly] public Texture2D castShadowsTexture;
 
@@ -42,7 +45,24 @@ namespace RealtimeCSG.Foundation
         [UsedImplicitly] public Texture2D shadowOnlyTexture;
         [UsedImplicitly] public Texture2D triggerTexture;
 
+        public Shader backgroundShader;
+        public Shader coloredPolygonShader;
+        public Shader customDotShader;
+        public Shader customNoDepthSurfaceShader;
+        public Shader customSurfaceShader;
+        public Shader customThickWireShader;
+        public Shader customWireShader;
+        public Shader customWireDottedShader;
+        public Shader genericLineShader;
+        public Shader gridShader;
+        public Shader noZTestGenericLineShader;
+        public Shader orthoGridShader;
+        public Shader specialSurfaceShader;
+        public Shader transparentSpecialSurfaceShader;
+        public Shader zTestGenericLineShader;
+
         private static RcsgEditorResources m_Instance;
+        private static Material m_MissingErrorMaterial;
 
         public static RcsgEditorResources Instance
         {
@@ -58,13 +78,16 @@ namespace RealtimeCSG.Foundation
             }
         }
 
+        private static string CurrentRenderPipeline
+        {
+            get => RenderPipelineHelper.GetCurrentPipeline(out Shader _);
+        }
+
         public static Material DefaultOpaqueMaterial
         {
             get
             {
-                string pipeline = RenderPipelineHelper.GetCurrentPipeline(out Shader _);
-
-                return pipeline switch
+                return CurrentRenderPipeline switch
                 {
                     RenderPipelineHelper.URP_TAG  => Instance.templateUrpOpaqueMaterial
                   , RenderPipelineHelper.HDRP_TAG => Instance.templateHdrpOpaqueMaterial
@@ -77,9 +100,7 @@ namespace RealtimeCSG.Foundation
         {
             get
             {
-                string pipeline = RenderPipelineHelper.GetCurrentPipeline(out Shader _);
-
-                return pipeline switch
+                return CurrentRenderPipeline switch
                 {
                     RenderPipelineHelper.URP_TAG  => Instance.templateUrpTransparentMaterial
                   , RenderPipelineHelper.HDRP_TAG => Instance.templateHdrpTransparentMaterial
@@ -92,9 +113,7 @@ namespace RealtimeCSG.Foundation
         {
             get
             {
-                string pipeline = RenderPipelineHelper.GetCurrentPipeline(out Shader _);
-
-                return pipeline switch
+                return CurrentRenderPipeline switch
                 {
                     RenderPipelineHelper.HDRP_TAG => "_MaskMap"
                   , _                             => "_MetallicGlossMap"
@@ -106,13 +125,24 @@ namespace RealtimeCSG.Foundation
         {
             get
             {
-                string pipeline = RenderPipelineHelper.GetCurrentPipeline(out Shader _);
-
-                return pipeline switch
+                return CurrentRenderPipeline switch
                 {
                     RenderPipelineHelper.URP_TAG => "_DetailAlbedoMap"
                   , _                            => "_DetailMap"
                 };
+            }
+        }
+
+        public static Material MissingErrorMaterial
+        {
+            get
+            {
+                if(m_MissingErrorMaterial == null)
+                {
+                    m_MissingErrorMaterial = new Material(Shader.Find("Hidden/InternalErrorShader"));
+                }
+
+                return m_MissingErrorMaterial;
             }
         }
     }

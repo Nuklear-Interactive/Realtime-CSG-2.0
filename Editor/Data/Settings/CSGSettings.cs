@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using InternalRealtimeCSG;
 using RealtimeCSG.Components;
+using RealtimeCSG.Foundation;
 using RealtimeCSG.Legacy;
 using UnityEditor;
 using UnityEngine;
@@ -287,7 +288,7 @@ namespace RealtimeCSG
             }
         }
 
-        public static Material SelectedMaterial = MaterialUtility.WallMaterial;
+        public static Material SelectedMaterial = RcsgEditorResources.Instance.defaultWallMaterial;
 
         private const TexGenFlags DEFAULT_TEXT_GEN_FLAGS_STATE = TexGenFlags.WorldSpaceTexture;
         public static TexGenFlags DefaultTexGenFlags = DEFAULT_TEXT_GEN_FLAGS_STATE;
@@ -818,7 +819,7 @@ namespace RealtimeCSG
             ClipMode          = GetEnum("ClipMode", ClipMode.RemovePositive);
             EnableRealtimeCSG = EditorPrefs.GetBool("EnableRealtimeCSG", true);
 
-            DefaultMaterial = GetMaterial("DefaultMaterial", MaterialUtility.WallMaterial);
+            DefaultMaterial = GetMaterial("DefaultMaterial", RcsgEditorResources.Instance.defaultWallMaterial);
 
             SnapScale          = EditorPrefs.GetFloat("ScaleSnap", 0.1f);
             SnapRotation       = EditorPrefs.GetFloat("RotationSnap", 15.0f);
@@ -843,7 +844,7 @@ namespace RealtimeCSG
             SyncronizeGrids = EditorPrefs.GetBool("SyncronizeGrids", false);
 
             AllowDirectBrushDragging = EditorPrefs.GetBool("AllowDirectBrushDragging", false);
-            
+
             AllowTextureCoordinateDragging = EditorPrefs.GetBool("AllowTextureCoordinateDragging", true);
 
             AutoCommitExtrusion = EditorPrefs.GetBool("AutoCommitExtrusion", false);
@@ -886,7 +887,7 @@ namespace RealtimeCSG
             }
 
             Presets = loadedPresets;
-  
+
             UpdateLightmapUVButtonMode = (UpdateLightmapUVButtonState)EditorPrefs.GetInt("UpdateLightmapUVButtonMode", 1);
 
             DistanceUnit = GetEnum("DistanceUnit", DistanceUnit.Meters);
@@ -991,7 +992,7 @@ namespace RealtimeCSG
             EditorPrefs.SetFloat("LinearStairsHeightOffset", LinearStairsHeightOffset);
 
             EditorPrefs.SetString("CSGPresets", Newtonsoft.Json.JsonConvert.SerializeObject(Presets));
-  
+
             EditorPrefs.SetInt("UpdateLightmapUVButtonMode", (int)UpdateLightmapUVButtonMode);
 
             SetMaterial("DefaultMaterial", DefaultMaterial);

@@ -11,10 +11,10 @@ namespace RealtimeCSG
 {
     public static class MaterialUtility
     {
-        internal const string SHADER_NAME_ROOT = "Hidden/CSG/internal/";
-        internal const string SPECIAL_SURFACE_SHADER_NAME = "specialSurface";
+        internal const string SHADER_NAME_ROOT = "Hidden/CSG/Internal/";
+        internal const string SPECIAL_SURFACE_SHADER_NAME = "SpecialSurface";
         internal const string SPECIAL_SURFACE_SHADER_ID = SHADER_NAME_ROOT + SPECIAL_SURFACE_SHADER_NAME;
-        internal const string TRANSPARENT_SPECIAL_SURFACE_SHADER_NAME = "transparentSpecialSurface";
+        internal const string TRANSPARENT_SPECIAL_SURFACE_SHADER_NAME = "TransparentSpecialSurface";
 
         internal const string TRANSPARENT_SPECIAL_SURFACE_SHADER_ID = SHADER_NAME_ROOT + TRANSPARENT_SPECIAL_SURFACE_SHADER_NAME;
 
@@ -34,11 +34,6 @@ namespace RealtimeCSG
         internal const string CAST_SHADOWS_MATERIAL_NAME = SPECIAL_SURFACE_SHADER_NAME + "_" + CAST_SHADOWS_NAME;
         internal const string RECEIVE_SHADOWS_MATERIAL_NAME = SPECIAL_SURFACE_SHADER_NAME + "_" + RECEIVE_SHADOWS_NAME;
 
-        private const string WALL_MATERIAL_NAME = "M_Wall";
-        private const string FLOOR_MATERIAL_NAME = "M_Floor";
-        private const string WINDOW_MATERIAL_NAME = "M_Window";
-        private const string METAL_MATERIAL_NAME = "M_Metal";
-
         internal static Shader SpecialSurfaceShader;
         internal static Shader TransparentSpecialSurfaceShader;
 
@@ -51,10 +46,6 @@ namespace RealtimeCSG
         private static int m_LineAlphaMultiplierId = -1;
 
         private static readonly int editorColorMaterialColorProp = Shader.PropertyToID("_Color");
-        private static readonly int shaderMainTexDiffuseProp = Shader.PropertyToID("_Diffuse");
-        private static readonly int shaderMainTexAlbedoProp = Shader.PropertyToID("_Albedo");
-        private static readonly int shaderMainTexBaseColorMapProp = Shader.PropertyToID("_BaseColorMap");
-        private static readonly int shaderMainTexMainTexProp = Shader.PropertyToID("_MainTex");
 
         private static void ShaderInit()
         {
@@ -158,152 +149,9 @@ namespace RealtimeCSG
             return material;
         }
 
-        private static bool TryGetShaderMainTex(Material material, out string mainTexTag)
-        {
-            if(material.HasProperty(shaderMainTexDiffuseProp))
-            {
-                mainTexTag = "_Diffuse";
-
-                return true;
-            }
-
-            if(material.HasProperty(shaderMainTexAlbedoProp))
-            {
-                mainTexTag = "_Albedo";
-
-                return true;
-            }
-
-            if(material.HasProperty(shaderMainTexBaseColorMapProp))
-            {
-                mainTexTag = "_BaseColorMap";
-
-                return true;
-            }
-
-            if(material.HasProperty(shaderMainTexMainTexProp))
-            {
-                mainTexTag = "_MainTex";
-
-                return true;
-            }
-
-            mainTexTag = "";
-
-            return false;
-        }
-
-        /*
-         * 1: Check that we actually have the material were looking for
-         * 2: Find RP type, and then create any neccessary directories
-         * 3: If we arent on the built-in RP, then update the material to the default material shader for the current RP
-         * 3.1: Stop entirely if the default material shader doesnt have a compatible default main texture property
-         * 4: Save the changes to disk
-         */
-        private static void GenerateBuiltinPipelineMaterial(string name)
-        {
-            string path = $"RealtimeCSG/Materials/{name}";
-            Material material = Resources.Load<Material>(path);
-            string folderPath = Path.GetFullPath($"{Application.dataPath}/Resources/RealtimeCSG/Materials/");
-
-            if(!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-
-            // if we cant find the material in resources, then we'll create them under Assets/Resources/RealtimeCSG/Materials/
-            if(material == null)
-            {
-                using(new AssetHelper.AssetEditingContext())
-                {
-                    RenderPipelineHelper.GetCurrentPipeline(out Shader defaultShader);
-                    material = new Material(defaultShader);
-                    material.name = name;
-
-                    if(material.mainTexture == null)
-                    {
-                        switch(name)
-                        {
-                            case WALL_MATERIAL_NAME:
-                                material.parent = RcsgEditorResources.DefaultOpaqueMaterial;
-                                material.mainTexture = RcsgEditorResources.Instance.defaultWallTexture;
-                                material.SetFloat("_Smoothness", 0.1f);
-
-                                break;
-                            case FLOOR_MATERIAL_NAME:
-                                material.parent = RcsgEditorResources.DefaultOpaqueMaterial;
-                                material.mainTexture = RcsgEditorResources.Instance.defaultFloorTexture;
-                                material.SetFloat("_Smoothness", 0.1f);
-
-                                break;
-                            case WINDOW_MATERIAL_NAME:
-                                material.parent = RcsgEditorResources.DefaultTransparentMaterial;
-                                material.mainTexture = RcsgEditorResources.Instance.defaultWindowTexture;
-                                material.SetFloat("_Smoothness", 0.9f);
-
-
-                                break;
-                            case METAL_MATERIAL_NAME:
-                                material.parent = RcsgEditorResources.DefaultOpaqueMaterial;
-                                material.mainTexture = RcsgEditorResources.Instance.defaultCheckerTexture;
-                                material.SetTexture(RcsgEditorResources.MetallicMapName, RcsgEditorResources.Instance.defaultMetalnessTexture);
-                                material.SetTexture(RcsgEditorResources.DetailAlbedoMapName, RcsgEditorResources.Instance.defaultDetailCheckerTexture);
-                                material.SetFloat("_Metallic", 1);
-                                material.SetFloat("_Smoothness", 1);
-
-                                break;
-                        }
-                    }
-                }
-
-                AssetDatabase.CreateAsset(material, $"Assets/Resources/{path}.mat");
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-            }
-        }
-
-        internal static Material GetRuntimeMaterial(string materialName)
-        {
-            GenerateBuiltinPipelineMaterial(WALL_MATERIAL_NAME);
-            GenerateBuiltinPipelineMaterial(FLOOR_MATERIAL_NAME);
-            GenerateBuiltinPipelineMaterial(WINDOW_MATERIAL_NAME);
-            GenerateBuiltinPipelineMaterial(METAL_MATERIAL_NAME);
-
-            return Resources.Load<Material>($"RealtimeCSG/Materials/{materialName}");
-        }
-
         internal static PhysicsMaterial GetRuntimePhysicMaterial(string materialName)
         {
             return Resources.Load<PhysicsMaterial>($"RealtimeCSG/Materials/{materialName}");
-        }
-
-        private static Material m_DefaultMaterial;
-
-        public static Material DefaultMaterial
-        {
-            get
-            {
-                if(!m_DefaultMaterial)
-                {
-                    RenderPipelineAsset renderPipelineAsset = GraphicsSettings.defaultRenderPipeline;
-
-                    if(renderPipelineAsset)
-                    {
-                        m_DefaultMaterial = renderPipelineAsset.defaultMaterial;
-
-                        if(!m_DefaultMaterial)
-                        {
-                            m_DefaultMaterial = GetColorMaterial(Color.magenta);
-                        }
-                    }
-                    else
-                    {
-                        m_DefaultMaterial = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Diffuse.mat");
-                    }
-                }
-
-                return m_DefaultMaterial;
-            }
         }
 
         private static PhysicsMaterial m_DefaultPhysicsMaterial;
@@ -353,106 +201,6 @@ namespace RealtimeCSG
             colorMaterials.Add(color, material);
 
             return material;
-        }
-
-        private static Material m_MissingMaterial;
-
-        public static Material MissingMaterial
-        {
-            get
-            {
-                if(!m_MissingMaterial)
-                {
-                    m_MissingMaterial = GetColorMaterial(Color.magenta);
-
-                    if(!m_MissingMaterial)
-                    {
-                        return DefaultMaterial;
-                    }
-                }
-
-                return m_MissingMaterial;
-            }
-        }
-
-        private static Material m_WallMaterial;
-
-        public static Material WallMaterial
-        {
-            get
-            {
-                if(!m_WallMaterial)
-                {
-                    m_WallMaterial = GetRuntimeMaterial(WALL_MATERIAL_NAME);
-
-                    if(!m_WallMaterial)
-                    {
-                        return DefaultMaterial;
-                    }
-                }
-
-                return m_WallMaterial;
-            }
-        }
-
-        private static Material m_FloorMaterial;
-
-        public static Material FloorMaterial
-        {
-            get
-            {
-                if(!m_FloorMaterial)
-                {
-                    m_FloorMaterial = GetRuntimeMaterial(FLOOR_MATERIAL_NAME);
-
-                    if(!m_FloorMaterial)
-                    {
-                        return DefaultMaterial;
-                    }
-                }
-
-                return m_FloorMaterial;
-            }
-        }
-
-        private static Material m_WindowMaterial;
-
-        public static Material WindowMaterial
-        {
-            get
-            {
-                if(!m_WindowMaterial)
-                {
-                    m_WindowMaterial = GetRuntimeMaterial(WINDOW_MATERIAL_NAME);
-
-                    if(!m_WindowMaterial)
-                    {
-                        return DefaultMaterial;
-                    }
-                }
-
-                return m_WindowMaterial;
-            }
-        }
-
-        private static Material m_MetalMaterial;
-
-        public static Material MetalMaterial
-        {
-            get
-            {
-                if(!m_MetalMaterial)
-                {
-                    m_MetalMaterial = GetRuntimeMaterial(METAL_MATERIAL_NAME);
-
-                    if(!m_MetalMaterial)
-                    {
-                        return DefaultMaterial;
-                    }
-                }
-
-                return m_MetalMaterial;
-            }
         }
 
         private static float m_LineThicknessMultiplier = 1.0f;
@@ -574,7 +322,7 @@ namespace RealtimeCSG
             {
                 if(!m_ColoredPolygonMaterial)
                 {
-                    m_ColoredPolygonMaterial = GenerateEditorMaterial("customSurface");
+                    m_ColoredPolygonMaterial = GenerateEditorMaterial("Surface");
                 }
 
                 return m_ColoredPolygonMaterial;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using InternalRealtimeCSG;
 using RealtimeCSG.Components;
+using RealtimeCSG.Foundation;
 using RealtimeCSG.Legacy;
 using UnityEditor;
 using UnityEngine;
@@ -1333,7 +1334,7 @@ namespace RealtimeCSG
             {
                 if(!newMaterial)
                 {
-                    newMaterial = MaterialUtility.MissingMaterial;
+                    newMaterial = new Material(RcsgEditorResources.MissingErrorMaterial); //MaterialUtility.MissingMaterial;
                 }
 
                 SurfaceUtility.SetMaterials(m_SurfaceState.selectedBrushSurfaces, newMaterial);
@@ -1380,7 +1381,7 @@ namespace RealtimeCSG
 
             CSGModel[] models               = InternalCSGModelManager.Models;
             bool       needLightmapUVUpdate = EditModeCommonGUI.NeedLightmapUVUpdate(models);
-          
+
             if (CSGSettings.UpdateLightmapUVButtonMode != CSGSettings.UpdateLightmapUVButtonState.InCSGToolWidow && CSGSettings.UpdateLightmapUVButtonMode != CSGSettings.UpdateLightmapUVButtonState.Both)
             {
                 needLightmapUVUpdate = false;

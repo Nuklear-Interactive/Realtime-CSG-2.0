@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/customWireDotted"
+Shader "Hidden/CSG/Internal/WireDotted"
 {
     Properties
     {

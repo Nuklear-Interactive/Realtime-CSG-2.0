@@ -744,7 +744,7 @@ namespace InternalRealtimeCSG
             GetGameObjectAndGeneratedMeshInstance(unusedInstances, meshDescription, out GameObject meshInstanceGameObject, out GeneratedMeshInstance meshInstance);
 
             meshInstance.Reset();
-            
+
             //meshInstanceGameObject.SetActive(false);
 
             meshInstanceGameObject.transform.SetParent(generatedMeshesTransform, false);
@@ -1316,12 +1316,12 @@ namespace InternalRealtimeCSG
                 if(shadowCastingMode == ShadowCastingMode.ShadowsOnly)
                     // Note: need non-transparent material here
                 {
-                    requiredMaterial = MaterialUtility.DefaultMaterial;
+                    requiredMaterial = RcsgEditorResources.DefaultOpaqueMaterial;
                 }
 
                 if(!requiredMaterial)
                 {
-                    requiredMaterial = MaterialUtility.MissingMaterial;
+                    requiredMaterial = new Material(RcsgEditorResources.MissingErrorMaterial);
                 }
 
                 if(!meshRendererComponent)

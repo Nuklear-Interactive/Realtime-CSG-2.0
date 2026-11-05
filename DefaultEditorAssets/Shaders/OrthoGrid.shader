@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/OrthoGrid"
+Shader "Hidden/CSG/Internal/OrthoGrid"
 {
     Properties
     {

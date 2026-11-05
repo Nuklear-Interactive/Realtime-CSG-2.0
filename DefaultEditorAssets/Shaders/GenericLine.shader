@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/ZTestGenericLine_old"
+Shader "Hidden/CSG/Internal/ZTestGenericLine_old"
 {
     Properties
     {

@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/Background"
+Shader "Hidden/CSG/Internal/Background"
 {
 
     Properties
@@ -84,8 +84,8 @@ Shader "Hidden/CSG/internal/Background"
             {
                 return _BackgroundColor;
             }
-            ENDCG  
-        }  
+            ENDCG
+        }
     }
     */
 }

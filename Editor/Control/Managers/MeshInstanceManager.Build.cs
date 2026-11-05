@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using UnityEditor;
 using RealtimeCSG;
 using RealtimeCSG.Components;
+using RealtimeCSG.Foundation;
 
 namespace InternalRealtimeCSG
 {
@@ -74,7 +75,7 @@ namespace InternalRealtimeCSG
 
                         if(meshRenderer)
                         {
-                            meshRenderer.sharedMaterial = MaterialUtility.DefaultMaterial;
+                            meshRenderer.sharedMaterial = RcsgEditorResources.DefaultOpaqueMaterial;
                             meshRenderer.enabled        = true;
                         }
 

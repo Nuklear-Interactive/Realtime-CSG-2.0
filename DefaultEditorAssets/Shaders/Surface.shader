@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/customWire"
+Shader "Hidden/CSG/Internal/Surface"
 {
     Properties {}
     SubShader
@@ -34,7 +34,7 @@ Shader "Hidden/CSG/internal/customWire"
             {
                 v2f o;
                 o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
-                //o.pos.z += 0.00105f;	// I would use Offset if it actually worked ..
+                //o.pos.z += 10.00105f;	// I would use Offset if it actually worked ..
                 o.color = v.color;
                 return o;
             }

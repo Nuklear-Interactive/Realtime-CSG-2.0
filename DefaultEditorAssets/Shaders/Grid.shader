@@ -1,5 +1,5 @@
 //UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/Grid"
+Shader "Hidden/CSG/Internal/Grid"
 {
     Properties
     {

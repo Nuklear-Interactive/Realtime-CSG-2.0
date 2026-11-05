@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/customThickWire"
+Shader "Hidden/CSG/Internal/ThickWire"
 {
     Properties {}
     SubShader

@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/transparentSpecialSurface"
+Shader "Hidden/CSG/Internal/SpecialSurface"
 {
     Properties
     {
@@ -9,11 +9,10 @@ Shader "Hidden/CSG/internal/transparentSpecialSurface"
     {
         Tags
         {
-            "Queue" = "Transparent" "RenderType" = "Transparent"
+            "Queue" = "Geometry" "RenderType" = "Opaque"
         }
         Cull Off
         Lighting Off
-        Blend One OneMinusSrcAlpha
         LOD 100
 
         Pass
@@ -63,8 +62,6 @@ Shader "Hidden/CSG/internal/transparentSpecialSurface"
             fixed4 frag(v2f i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
-                col.a = 0.5f;
-                col.rgb *= col.a;
                 return col;
             }
             ENDCG

@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/NoZTestGenericLine"
+Shader "Hidden/CSG/Internal/NoZTestGenericLine"
 {
     Properties
     {

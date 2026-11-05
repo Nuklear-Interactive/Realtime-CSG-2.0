@@ -1,5 +1,5 @@
 ﻿//UNITY_SHADER_NO_UPGRADE
-Shader "Hidden/CSG/internal/customNoDepthSurface"
+Shader "Hidden/CSG/Internal/NoDepthSurface"
 {
     Properties {}
     SubShader
