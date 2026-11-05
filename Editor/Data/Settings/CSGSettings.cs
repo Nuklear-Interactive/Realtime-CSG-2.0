@@ -269,7 +269,25 @@ namespace RealtimeCSG
         public static float DefaultShapeHeight = 1.0f;
         public static uint CurveSides = 10;
         public static ClipMode ClipMode = ClipMode.RemovePositive;
-        public static Material DefaultMaterial = MaterialUtility.WallMaterial;
+        public static Material DefaultMaterial
+        {
+            get
+            {
+                if (EditMode == ToolEditMode.Generate && GeneratorBase.MatchedMaterial != null)
+                {
+                    return GeneratorBase.MatchedMaterial;
+                }
+
+                return SelectedMaterial;
+            }
+
+            set
+            {
+                SelectedMaterial = value;
+            }
+        }
+
+        public static Material SelectedMaterial = MaterialUtility.WallMaterial;
 
         private const TexGenFlags DEFAULT_TEXT_GEN_FLAGS_STATE = TexGenFlags.WorldSpaceTexture;
         public static TexGenFlags DefaultTexGenFlags = DEFAULT_TEXT_GEN_FLAGS_STATE;
@@ -309,6 +327,9 @@ namespace RealtimeCSG
         public static bool HiddenSurfacesNotSelectable = true;
 
         public static bool ShowTooltips = true;
+
+        public static bool AllowDirectBrushDragging = false;
+        public static bool AllowTextureCoordinateDragging = false;
 
         public static Dictionary<PresetCategory, List<Preset>> Presets
         {
@@ -414,6 +435,8 @@ namespace RealtimeCSG
                 }
             }
         }
+
+        public static bool SyncronizeGrids = true;
 
         public static bool SnapNonCSGObjects = true;
 
@@ -817,6 +840,12 @@ namespace RealtimeCSG
 
             SnapNonCSGObjects = EditorPrefs.GetBool("SnapNonCSGObjects", true);
 
+            SyncronizeGrids = EditorPrefs.GetBool("SyncronizeGrids", false);
+
+            AllowDirectBrushDragging = EditorPrefs.GetBool("AllowDirectBrushDragging", false);
+            
+            AllowTextureCoordinateDragging = EditorPrefs.GetBool("AllowTextureCoordinateDragging", true);
+
             AutoCommitExtrusion = EditorPrefs.GetBool("AutoCommitExtrusion", false);
 
             MaxSphereSplits = Mathf.Max(3, EditorPrefs.GetInt("MaxSphereSplits", 9));
@@ -926,6 +955,12 @@ namespace RealtimeCSG
 
             EditorPrefs.SetBool("SnapNonCSGObjects", SnapNonCSGObjects);
 
+            EditorPrefs.SetBool("SyncronizeGrids", SyncronizeGrids);
+
+            EditorPrefs.SetBool("AllowDirectBrushDragging", AllowDirectBrushDragging);
+
+            EditorPrefs.SetBool("AllowTextureCoordinateDragging", AllowTextureCoordinateDragging);
+
             EditorPrefs.SetBool("AutoCommitExtrusion", AutoCommitExtrusion);
 
             EditorPrefs.SetInt("SnapMode", (int)SnapMode);
@@ -981,6 +1016,32 @@ namespace RealtimeCSG
             }
 
             EditorPrefs.SetString("Wireframe", builder.ToString());
+        }
+
+#endregion
+
+#region Grid
+        private static Vector3 LastGridSize;
+
+        public static void SyncronizeGrid()
+        {
+            bool GridChanged = false;
+
+            if (LastGridSize != EditorSnapSettings.gridSize)
+            {
+                GridChanged = true;
+
+                SnapVector = EditorSnapSettings.gridSize;
+
+                LastGridSize = EditorSnapSettings.gridSize;
+            }
+
+            if (GridChanged)
+            {
+                UpdateSnapSettings();
+                Save();
+                CSGEditorGUIUtility.RepaintAll();
+            }
         }
 
 #endregion

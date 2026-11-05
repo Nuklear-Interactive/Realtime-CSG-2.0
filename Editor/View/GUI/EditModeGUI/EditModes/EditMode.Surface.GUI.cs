@@ -1018,7 +1018,7 @@ namespace RealtimeCSG
         {
             EditModeCommonGUI.StartToolGUI();
 
-            if(Event.current.type == EventType.Layout)
+            if (Event.current.type == EventType.Layout)
             {
                 m_SurfaceState = new SurfaceState();
                 m_SurfaceState.Init(tool);
@@ -1370,7 +1370,6 @@ namespace RealtimeCSG
 
         public static void OnSceneGUI(Rect windowRect, EditModeSurface tool)
         {
-            CsgguiStyleUtility.InitStyles();
             InitLocalStyles();
 
             float maxHeight = windowRect.height - 80;
@@ -1395,6 +1394,10 @@ namespace RealtimeCSG
             currentArea.y      = y;
             currentArea.height = visibleHeight;
 
+            //Padding to prevent clipping of left and bottom edge of surfaces window
+            currentArea.x += 10;
+            currentArea.y -= 10;
+
             Rect      boxArea               = currentArea;
             const int scrollbarWidth        = 10;
             const int scrollbarRightOffset  = 7;
@@ -1413,6 +1416,7 @@ namespace RealtimeCSG
             }
 
             GUI.Box(boxArea, m_ContentSurfacesLabel, windowStyle);
+
             int windowControlID = GUIUtility.GetControlID(sceneViewSurfaceOverlayHash, FocusType.Keyboard, boxArea);
 
             currentArea.x     += 5;
@@ -1449,10 +1453,12 @@ namespace RealtimeCSG
             buttonArea.height =  13;
             buttonArea.width  =  13;
 
+            /*
             if(GUI.Button(buttonArea, GUIContent.none, "SearchCancelButton"))
             {
                 EditModeToolWindowSceneGUI.GetWindow();
             }
+            */
 
             TooltipUtility.SetToolTip(CsgguiStyleUtility.popOutTooltip, buttonArea);
 
@@ -1515,7 +1521,6 @@ namespace RealtimeCSG
             m_LastGuiRect = Rect.MinMaxRect(-1, -1, -1, -1);
             EditModeSurface tool = EditModeManager.ActiveTool as EditModeSurface;
 
-            CsgguiStyleUtility.InitStyles();
             InitLocalStyles();
             OnGUIContents(false, tool);
         }

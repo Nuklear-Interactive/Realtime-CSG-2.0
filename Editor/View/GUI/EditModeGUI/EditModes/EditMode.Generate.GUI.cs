@@ -19,7 +19,6 @@ namespace RealtimeCSG
         public static bool OnSceneGUI(EditModeGenerate tool)
         {
             tool.CurrentGenerator.StartGUI();
-            CsgguiStyleUtility.InitStyles();
             InitLocalStyles();
             GUILayout.BeginHorizontal(CsgguiStyleUtility.contentEmpty);
 
@@ -48,10 +47,12 @@ namespace RealtimeCSG
             buttonArea.height =  13;
             buttonArea.width  =  13;
 
+            /*
             if(GUI.Button(buttonArea, GUIContent.none, "SearchCancelButton"))
             {
                 EditModeToolWindowSceneGUI.GetWindow();
             }
+            */
 
             TooltipUtility.SetToolTip(CsgguiStyleUtility.popOutTooltip, buttonArea);
 
@@ -144,6 +145,10 @@ namespace RealtimeCSG
             if(EditorGUI.EndChangeCheck())
             {
                 generator.CurrentCSGOperationType = operation;
+
+#if UNITY_6000_5_OR_NEWER
+                HierarchyWindowItemGUI.RepaintHierarchy();
+#endif
             }
 
             GUILayout.EndVertical();
@@ -153,7 +158,7 @@ namespace RealtimeCSG
 
         private static void CommitOrCancel(bool isSceneGUI, EditModeGenerate tool)
         {
-            Material defaultMaterial = CSGSettings.DefaultMaterial;
+            Material defaultMaterial = CSGSettings.SelectedMaterial;
             GUILayout.BeginHorizontal(CsgguiStyleUtility.contentEmpty);
 
             if(isSceneGUI)
@@ -203,8 +208,6 @@ namespace RealtimeCSG
 
             GUILayout.EndHorizontal();
 
-            GUI.enabled = !EditorPrefs.GetBool("GenerateUsingSurfaceMaterial", false);
-
             if (isSceneGUI)
             {
                 GUILayout.Space(2);
@@ -219,8 +222,6 @@ namespace RealtimeCSG
                     CSGSettings.Save();
                 }
             }
-
-            GUI.enabled = true;
 
             EditorPrefs.SetBool("GenerateUsingSurfaceMaterial", GUILayout.Toggle(EditorPrefs.GetBool("GenerateUsingSurfaceMaterial", false), "Match Surface", EditorStyles.miniButton));
         }
@@ -320,7 +321,6 @@ namespace RealtimeCSG
         {
             m_LastGuiRect = Rect.MinMaxRect(-1, -1, -1, -1);
             tool.CurrentGenerator.StartGUI();
-            CsgguiStyleUtility.InitStyles();
             InitLocalStyles();
             OnGUIContents(tool, false, height);
             tool.CurrentGenerator.FinishGUI();

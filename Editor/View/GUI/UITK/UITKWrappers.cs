@@ -11,44 +11,45 @@ namespace RealtimeCSG
     {
         static BottomBarUITKWrapper()
         {
+            SceneView.duringSceneGui -= OnSceneGUI;
             SceneView.duringSceneGui += OnSceneGUI;
         }
 
-        static IMGUIContainer bottomBarContainer;
+        static IMGUIContainer BottomBarContainer = null;
 
         private static void OnSceneGUI(SceneView sceneView)
         {
-            if (bottomBarContainer == null)
+            bool InSceneView = sceneView.rootVisualElement.Contains(BottomBarContainer);
+
+            if (CSGSettings.EnableRealtimeCSG == true && BottomBarContainer == null && SceneDragToolManager.IsDraggingObjectInScene == false && InSceneView == false)
             {
-                bottomBarContainer = new IMGUIContainer(() =>
+                BottomBarContainer = new IMGUIContainer(() =>
                 {
                     SceneViewBottomBarGUI.ShowGUI(sceneView);
                 });
 
-                bottomBarContainer.name = "RCSG-BottomBar";
+                BottomBarContainer.name = "RCSG-BottomBar";
+
+                BottomBarContainer.pickingMode = PickingMode.Position;
+
+                BottomBarContainer.style.position = Position.Absolute;
+
+                BottomBarContainer.style.bottom = 0;
+                BottomBarContainer.style.width = Length.Percent(100);
+                BottomBarContainer.style.height = CsgguiStyleUtility.BOTTOM_TOOL_BAR_HEIGHT + 4;
+
+                BottomBarContainer.style.backgroundColor = new Color(0.24f, 0.24f, 0.24f, 1.0f);
+
+                sceneView.rootVisualElement.Add(BottomBarContainer);
             }
-
-            bottomBarContainer.pickingMode = PickingMode.Position;
-
-            bottomBarContainer.style.position = Position.Absolute;
-
-            bottomBarContainer.style.bottom = 0;
-            bottomBarContainer.style.width = Length.Percent(100);
-            bottomBarContainer.style.height = CsgguiStyleUtility.BOTTOM_TOOL_BAR_HEIGHT + 4;
-
-            bottomBarContainer.style.backgroundColor = new Color(0.24f, 0.24f, 0.24f, 1.0f);
-
-            var root = sceneView.rootVisualElement;
-
-            IMGUIContainer foundContainer = root.Q<IMGUIContainer>("RCSG-BottomBar");
-
-            if (CSGSettings.EnableRealtimeCSG == true && foundContainer == null && SceneDragToolManager.IsDraggingObjectInScene == false)
+            else if ((CSGSettings.EnableRealtimeCSG == false || SceneDragToolManager.IsDraggingObjectInScene == true || InSceneView == false) && BottomBarContainer != null)
             {
-                root.Add(bottomBarContainer);
-            }
-            else if ((CSGSettings.EnableRealtimeCSG == false || SceneDragToolManager.IsDraggingObjectInScene == true) && foundContainer != null)
-            {
-                root.Remove(foundContainer);
+                if (InSceneView)
+                {
+                    sceneView.rootVisualElement.Remove(BottomBarContainer);
+                }
+
+                BottomBarContainer = null;
             }
         }
     }
@@ -58,6 +59,7 @@ namespace RealtimeCSG
     {
         static ToolWindowUITKWrapper()
         {
+            SceneView.duringSceneGui -= OnSceneGUI;
             SceneView.duringSceneGui += OnSceneGUI;
         }
 
@@ -178,13 +180,22 @@ namespace RealtimeCSG
             }
         }
 
-        static IMGUIContainer activeToolContainer;
+        static IMGUIContainer ActiveToolContainer = null;
 
         private static void OnSceneGUI(SceneView sceneView)
         {
-            if (activeToolContainer == null)
+            bool ForceHide = false;
+
+            if(ActiveToolName == "EditModePlace" && (EditModeManager.FilteredSelection.nodeTargets == null || EditModeManager.FilteredSelection.nodeTargets.Length == 0))
             {
-                activeToolContainer = new IMGUIContainer(() =>
+                ForceHide = true;
+            }
+
+            bool InSceneView = sceneView.rootVisualElement.Contains(ActiveToolContainer);
+
+            if (CSGSettings.EnableRealtimeCSG == true && ActiveToolContainer == null && EditModeManager.ActiveTool != null && ForceHide == false && InSceneView == false)
+            {
+                ActiveToolContainer = new IMGUIContainer(() =>
                 {
                     Handles.BeginGUI();
 
@@ -192,7 +203,7 @@ namespace RealtimeCSG
                     Vector2 SurfaceModePadding = Vector2.zero;
                     if (ActiveToolName == "EditModeSurface")
                     {
-                        SurfaceModePadding = new Vector2(2, -10);
+                        SurfaceModePadding = new Vector2(-8, 0);
                     }
 
                     //-2 and +31 adjusts for alignment with container and GUILayout.Spaces
@@ -223,39 +234,33 @@ namespace RealtimeCSG
                     Handles.EndGUI();
                 });
 
-                activeToolContainer.name = "RCSG-ToolWindow";
+                ActiveToolContainer.name = "RCSG-ToolWindow";
+
+                ActiveToolContainer.pickingMode = PickingMode.Position;
+
+                ActiveToolContainer.style.position = Position.Absolute;
+
+                ActiveToolContainer.style.left = 5;
+                ActiveToolContainer.style.bottom = CsgguiStyleUtility.BOTTOM_TOOL_BAR_HEIGHT + 10;
+
+                sceneView.rootVisualElement.Add(ActiveToolContainer);
+            }
+            else if ((CSGSettings.EnableRealtimeCSG == false || EditModeManager.ActiveTool == null || SceneDragToolManager.IsDraggingObjectInScene == true || ForceHide == true || InSceneView == false) && ActiveToolContainer != null)
+            {
+                if (InSceneView)
+                {
+                    sceneView.rootVisualElement.Remove(ActiveToolContainer);
+                }
+
+                ActiveToolContainer = null;
             }
 
-            activeToolContainer.pickingMode = PickingMode.Position;
-
-            activeToolContainer.style.position = Position.Absolute;
-
-            activeToolContainer.style.left = 5;
-            activeToolContainer.style.bottom = CsgguiStyleUtility.BOTTOM_TOOL_BAR_HEIGHT + 10;
-
-            activeToolContainer.style.width = ToolWindowSize.x;
-            activeToolContainer.style.height = ToolWindowSize.y;
-
-            //activeToolContainer.style.backgroundColor = new Color(1, 0, 0, 1);
-
-            var root = sceneView.rootVisualElement;
-
-            IMGUIContainer foundContainer = root.Q<IMGUIContainer>("RCSG-ToolWindow");
-
-            bool ForceHide = false;
-
-            if(ActiveToolName == "EditModePlace" && (EditModeManager.FilteredSelection.nodeTargets == null || EditModeManager.FilteredSelection.nodeTargets.Length == 0))
+            if (ActiveToolContainer != null)
             {
-                ForceHide = true;
-            }
+                ActiveToolContainer.style.width = ToolWindowSize.x;
+                ActiveToolContainer.style.height = ToolWindowSize.y;
 
-            if (CSGSettings.EnableRealtimeCSG == true && foundContainer == null && EditModeManager.ActiveTool != null && ForceHide == false)
-            {
-                root.Add(activeToolContainer);
-            }
-            else if ((CSGSettings.EnableRealtimeCSG == false || EditModeManager.ActiveTool == null || SceneDragToolManager.IsDraggingObjectInScene == true|| ForceHide == true) && foundContainer != null)
-            {
-                root.Remove(foundContainer);
+                //activeToolContainer.style.backgroundColor = new Color(1, 0, 0, 1);
             }
         }
     }

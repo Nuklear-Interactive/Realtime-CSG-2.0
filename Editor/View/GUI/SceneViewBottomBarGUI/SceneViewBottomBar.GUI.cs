@@ -23,7 +23,6 @@ namespace RealtimeCSG
             }
 
             InitStyles();
-            CsgguiStyleUtility.InitStyles();
 
             if(sceneView != null)
             {
@@ -365,6 +364,11 @@ namespace RealtimeCSG
                             modified         = true;
                             moveSnapVector.y = moveSnapVector.x;
                             moveSnapVector.z = moveSnapVector.x;
+
+                            if (CSGSettings.SyncronizeGrids)
+                            {
+                                EditorSnapSettings.gridSize = new Vector3(moveSnapVector.x, moveSnapVector.x, moveSnapVector.x);
+                            }
                         }
 
                         EditorGUI.showMixedValue = false;
@@ -442,8 +446,15 @@ namespace RealtimeCSG
 
                         if(GUI.Button(m_CurrentRect, positionPlusLabel, EditorStyles.miniButtonLeft))
                         {
+                            GUIUtility.keyboardControl = 0;
+
                             GridUtility.DoubleGridSize();
                             moveSnapVector = CSGSettings.SnapVector;
+
+                            if (CSGSettings.SyncronizeGrids)
+                            {
+                                EditorSnapSettings.gridSize = CSGSettings.SnapVector;
+                            }
                         }
 
                         //(x:410.00, y:2.00, width:19.00, height:15.00)
@@ -458,8 +469,15 @@ namespace RealtimeCSG
 
                         if(GUI.Button(m_CurrentRect, positionMinusLabel, EditorStyles.miniButtonRight))
                         {
+                            GUIUtility.keyboardControl = 0;
+
                             GridUtility.HalfGridSize();
                             moveSnapVector = CSGSettings.SnapVector;
+
+                            if (CSGSettings.SyncronizeGrids)
+                            {
+                                EditorSnapSettings.gridSize = CSGSettings.SnapVector;
+                            }
                         }
 
                         //(x:429.00, y:2.00, width:17.00, height:15.00)
@@ -515,7 +533,16 @@ namespace RealtimeCSG
                             {
                                 if (GUI.changed && modified == false)
                                 {
-                                    CSGSettings.SnapVector = new Vector3(CSGSettings.Presets[PresetCategory.Grid_Size][i].Value, CSGSettings.Presets[PresetCategory.Grid_Size][i].Value, CSGSettings.Presets[PresetCategory.Grid_Size][i].Value);
+                                    GUIUtility.keyboardControl = 0;
+
+                                    Vector3 GridSize = new Vector3(CSGSettings.Presets[PresetCategory.Grid_Size][i].Value, CSGSettings.Presets[PresetCategory.Grid_Size][i].Value, CSGSettings.Presets[PresetCategory.Grid_Size][i].Value);
+
+                                    if (CSGSettings.SyncronizeGrids)
+                                    {
+                                        EditorSnapSettings.gridSize = GridSize;
+                                    }
+
+                                    CSGSettings.SnapVector = GridSize;
                                     CSGSettings.Save();
                                     moveSnapVector = CSGSettings.SnapVector;
                                 }
@@ -621,6 +648,8 @@ namespace RealtimeCSG
 
                         if(GUI.Button(m_CurrentRect, anglePlusLabel, EditorStyles.miniButtonLeft))
                         {
+                            GUIUtility.keyboardControl = 0;
+
                             rotationSnap *= 2.0f;
                             modified     =  true;
                         }
@@ -637,6 +666,8 @@ namespace RealtimeCSG
 
                         if(GUI.Button(m_CurrentRect, angleMinusLabel, EditorStyles.miniButtonRight))
                         {
+                            GUIUtility.keyboardControl = 0;
+
                             rotationSnap /= 2.0f;
                             modified     =  true;
                         }
@@ -692,6 +723,8 @@ namespace RealtimeCSG
                             {
                                 if (GUI.changed && modified == false)
                                 {
+                                    GUIUtility.keyboardControl = 0;
+
                                     CSGSettings.SnapRotation = CSGSettings.Presets[PresetCategory.Angle_Snap][i].Value;
                                     CSGSettings.Save();
                                     rotationSnap = CSGSettings.SnapRotation;
@@ -799,6 +832,8 @@ namespace RealtimeCSG
 
                         if(GUI.Button(m_CurrentRect, scalePlusLabel, EditorStyles.miniButtonLeft))
                         {
+                            GUIUtility.keyboardControl = 0;
+
                             scaleSnap *= 10.0f;
                             modified  =  true;
                         }
@@ -815,6 +850,8 @@ namespace RealtimeCSG
 
                         if(GUI.Button(m_CurrentRect, scaleMinusLabel, EditorStyles.miniButtonRight))
                         {
+                            GUIUtility.keyboardControl = 0;
+
                             scaleSnap /= 10.0f;
                             modified  =  true;
                         }
@@ -870,6 +907,8 @@ namespace RealtimeCSG
                             {
                                 if (GUI.changed && modified == false)
                                 {
+                                    GUIUtility.keyboardControl = 0;
+
                                     CSGSettings.SnapScale = CSGSettings.Presets[PresetCategory.Scale_Snap][i].Value;
                                     CSGSettings.Save();
                                     scaleSnap = CSGSettings.SnapScale;

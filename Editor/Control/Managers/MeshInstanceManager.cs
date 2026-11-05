@@ -744,7 +744,9 @@ namespace InternalRealtimeCSG
             GetGameObjectAndGeneratedMeshInstance(unusedInstances, meshDescription, out GameObject meshInstanceGameObject, out GeneratedMeshInstance meshInstance);
 
             meshInstance.Reset();
-            meshInstanceGameObject.SetActive(false);
+            
+            //meshInstanceGameObject.SetActive(false);
+
             meshInstanceGameObject.transform.SetParent(generatedMeshesTransform, false);
             meshInstanceGameObject.transform.localPosition = MathConstants.zeroVector3;
             meshInstanceGameObject.transform.localRotation = MathConstants.identityQuaternion;
@@ -793,7 +795,9 @@ namespace InternalRealtimeCSG
             meshInstance.physicsMaterial   = physicsMaterial;
             meshInstance.renderSurfaceType = renderSurfaceType;
 
-            meshInstanceGameObject.SetActive(true);
+            //meshInstanceGameObject.SetActive(true);
+
+            meshInstance.HandleOutsideOfGeneratedMeshesParent();
 
             Initialize(generatedMeshes, meshInstance);
 
@@ -1534,11 +1538,6 @@ namespace InternalRealtimeCSG
                     meshColliderComponent = gameObject.GetComponent<MeshCollider>();
                 }
 
-                if(meshColliderComponent && !meshColliderComponent.enabled)
-                {
-                    meshColliderComponent.enabled = true;
-                }
-
                 if(!meshColliderComponent)
                 {
                     meshColliderComponent                 = gameObject.AddComponent<MeshCollider>();
@@ -1598,11 +1597,9 @@ namespace InternalRealtimeCSG
                     meshColliderComponent.sharedMesh = instance.sharedMesh;
                 }
 
-                // .. for some reason this fixes mesh-colliders not being found with ray-casts in the editor?
                 if(instance.dirty)
                 {
-                    meshColliderComponent.enabled = false;
-                    meshColliderComponent.enabled = true;
+                    InternalCSGModelManagerSystem.FlagMeshColliderForCooking(meshColliderComponent);
                 }
             }
             else

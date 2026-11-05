@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using RealtimeCSG.Components;
+using System.Collections.Generic;
 using System.Linq;
-using RealtimeCSG.Components;
 using UnityEditor;
 using UnityEngine;
 
@@ -163,6 +163,32 @@ namespace RealtimeCSG
                 }
             }
 
+            for (int brushIndex = 0; brushIndex < Brushes.Count; brushIndex++)
+            {
+                CSGBrush brush = Brushes[brushIndex];
+
+                if (ReferenceEquals(brush, null) || !brush)
+                {
+                    continue;
+                }
+
+                int brushNodeID = brush.brushNodeID;
+
+                // make sure it's registered, otherwise ignore it
+                if (brushNodeID == CSGNode.INVALID_NODE_ID)
+                {
+                    continue;
+                }
+
+                if (brush.operationType != brush.prevOperation)
+                {
+                    brush.prevOperation = brush.operationType;
+
+                    External.setBrushOperationType(brushNodeID, brush.operationType);
+                }
+            }
+
+#if false
             for(int brushIndex = 0; brushIndex < Brushes.Count; brushIndex++)
             {
                 CSGBrush brush = Brushes[brushIndex];
@@ -236,6 +262,7 @@ namespace RealtimeCSG
                     ControlMeshUtility.RebuildShape(brush);
                 }
             }
+#endif
         }
 
 #endregion

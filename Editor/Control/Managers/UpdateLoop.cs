@@ -34,7 +34,7 @@ namespace RealtimeCSG
 
         private void Initialize()
         {
-            if(_initialized)
+            if (_initialized)
             {
                 return;
             }
@@ -64,7 +64,17 @@ namespace RealtimeCSG
             EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemGUI.OnHierarchyWindowItemOnGUI;
 #endif
 
+#if UNITY_6000_5_OR_NEWER
+            Unity.Hierarchy.Editor.HierarchyWindow.BindView -= HierarchyWindowItemGUI.OnBindView;
+            Unity.Hierarchy.Editor.HierarchyWindow.BindView += HierarchyWindowItemGUI.OnBindView;
+
+            Unity.Hierarchy.Editor.HierarchyWindow.BindViewItem -= HierarchyWindowItemGUI.OnBindViewItem;
+            Unity.Hierarchy.Editor.HierarchyWindow.BindViewItem += HierarchyWindowItemGUI.OnBindViewItem;
+#endif
+
             UnityCompilerDefineManager.UpdateUnityDefines();
+
+            InternalCSGModelManagerSystem.LazyInitialize();
         }
 
         private void OnPrefabSaving(GameObject obj)
@@ -109,6 +119,8 @@ namespace RealtimeCSG
             {
                 SceneToolRenderer.Cleanup();
             }
+
+            InternalCSGModelManagerSystem.Cleanup();
         }
 
         private static Scene m_CurrentScene;
@@ -233,6 +245,11 @@ namespace RealtimeCSG
 
             UpdateOnSceneChange();
 
+            if (CSGSettings.SyncronizeGrids)
+            {
+                CSGSettings.SyncronizeGrid();
+            }
+
             try
             {
                 if(!ColorSettings.IsInitialized)
@@ -240,6 +257,7 @@ namespace RealtimeCSG
                     ColorSettings.Update();
                 }
 
+                InternalCSGModelManagerSystem.Tick();
                 InternalCSGModelManager.CheckForChanges();
                 TooltipUtility.CleanCache();
             }
